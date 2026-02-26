@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xml:lang="zh">
+  <Esri>
+    <CreaDate>20260226</CreaDate>
+    <CreaTime>14420600</CreaTime>
+    <ArcGISFormat>1.0</ArcGISFormat>
+    <SyncOnce>TRUE</SyncOnce>
+    <ModDate>20260226</ModDate>
+    <ModTime>200000</ModTime>
+  </Esri>
+  <toolbox name="LandUseOptimization" alias="LandUseOpt">
+    <arcToolboxHelpPath>d:\program files\arcgis\pro\Resources\Help\gp</arcToolboxHelpPath>
+    <toolsets />
+  </toolbox>
+  <dataIdInfo>
+    <idCitation>
+      <resTitle>耕地空间布局优化工具箱 (DRL)</resTitle>
+    </idCitation>
+    <idAbs>基于深度强化学习（Maskable PPO）的耕地空间布局优化工具箱。通过配对的耕地-林地用地类型互换，在保持耕地总量不变（FC=0）的前提下，降低耕地平均坡度并提升空间连片性。
+
+本工具箱包含以下工具：
+
+1. DRL 用地优化 — 主优化工具，执行基于训练好的 DRL 模型的配对推理
+2. 依赖检查 — 验证运行环境和依赖项是否满足要求
+
+技术要求：
+- ArcGIS Pro 3.x 及以上
+- PyTorch (CPU 版本)
+- 输入数据须为包含用地分类（文本）和坡度（数值）字段的面要素类</idAbs>
+    <searchKeys>
+      <keyword>耕地空间布局优化</keyword>
+      <keyword>深度强化学习</keyword>
+      <keyword>DRL</keyword>
+      <keyword>Maskable PPO</keyword>
+      <keyword>用地优化</keyword>
+      <keyword>坡度优化</keyword>
+      <keyword>空间连片性</keyword>
+      <keyword>land use optimization</keyword>
+      <keyword>farmland</keyword>
+    </searchKeys>
+    <idCredit>Farmland Layout Optimization Research Project</idCredit>
+  </dataIdInfo>
+  <distInfo>
+    <distributor>
+      <distorFormat>
+        <formatName>ArcToolbox Toolbox</formatName>
+      </distorFormat>
+    </distributor>
+  </distInfo>
+</metadata>

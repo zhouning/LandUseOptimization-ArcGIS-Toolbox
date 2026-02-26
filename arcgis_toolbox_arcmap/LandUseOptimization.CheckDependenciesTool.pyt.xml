@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xml:lang="zh">
+  <Esri>
+    <CreaDate>20260226</CreaDate>
+    <CreaTime>20000000</CreaTime>
+    <ArcGISFormat>1.0</ArcGISFormat>
+    <SyncOnce>TRUE</SyncOnce>
+  </Esri>
+  <tool name="CheckDependenciesTool" displayname="依赖检查" toolboxalias="LandUseOpt">
+    <summary>验证当前 ArcMap Python 环境中 NumPy 及 arcpy 是否可用，并检查模型权重文件（.npz格式）是否存在。ArcMap 版本无需安装 PyTorch。</summary>
+    <usage>
+      <bullet_item>本工具无需任何输入参数，直接运行即可。</bullet_item>
+      <bullet_item>检查项目包括：Python 版本、NumPy 安装状态、arcpy 版本与许可级别、PolygonNeighbors 可用性、模型权重文件（.npz格式）。</bullet_item>
+      <bullet_item>ArcMap 版本使用纯 NumPy 进行模型推理，不需要 PyTorch。</bullet_item>
+      <bullet_item>模型权重文件（.npz）需通过 convert_weights_to_npz.py 脚本从 PyTorch 格式（.pt）转换而来，转换需在 Python 3 + PyTorch 环境下执行一次。</bullet_item>
+    </usage>
+  </tool>
+</metadata>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xml:lang="zh">
+  <Esri>
+    <CreaDate>20260226</CreaDate>
+    <CreaTime>14422300</CreaTime>
+    <ArcGISFormat>1.0</ArcGISFormat>
+    <SyncOnce>TRUE</SyncOnce>
+    <ModDate>20260226</ModDate>
+    <ModTime>200000</ModTime>
+  </Esri>
+  <tool name="CheckDependenciesTool" displayname="依赖检查" toolboxalias="LandUseOpt">
+    <summary>验证当前 ArcGIS Pro Python 环境中 PyTorch 及其他必需包是否可用，并检查模型权重文件是否存在。建议在首次使用优化工具前运行此工具。</summary>
+    <usage>
+      <bullet_item>本工具无需任何输入参数，直接运行即可。</bullet_item>
+      <bullet_item>检查项目包括：Python 版本、PyTorch 安装状态、NumPy 安装状态、arcpy 版本与许可级别、PolygonNeighbors 可用性（需要 Advanced 许可）、默认模型权重文件。</bullet_item>
+      <bullet_item>如果 PyTorch 未安装，工具会显示安装命令。请通过 ArcGIS Pro 的 Python 命令提示符执行安装：pip install torch --index-url https://download.pytorch.org/whl/cpu</bullet_item>
+      <bullet_item>如果许可级别非 Advanced，邻接图构建将使用较慢的几何相交回退方法，但不影响最终结果。</bullet_item>
+      <bullet_item>模型权重文件默认位于工具箱目录下的 models/scorer_weights_v7.pt。</bullet_item>
+    </usage>
+  </tool>
+</metadata>

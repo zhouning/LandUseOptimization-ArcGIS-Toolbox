@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xml:lang="zh">
+  <Esri>
+    <CreaDate>20260226</CreaDate>
+    <CreaTime>20000000</CreaTime>
+    <ArcGISFormat>1.0</ArcGISFormat>
+    <SyncOnce>TRUE</SyncOnce>
+  </Esri>
+  <toolbox name="LandUseOptimization" alias="LandUseOpt">
+    <arcToolboxHelpPath>d:\program files (x86)\arcgis\desktop10.7\Help\gp</arcToolboxHelpPath>
+    <toolsets />
+  </toolbox>
+  <dataIdInfo>
+    <idCitation>
+      <resTitle>耕地空间布局优化工具箱 (DRL) - ArcMap版</resTitle>
+    </idCitation>
+    <idAbs>基于深度强化学习（Maskable PPO）的耕地空间布局优化工具箱（ArcMap 10.x 版本）。使用纯 NumPy 实现模型推理，无需 PyTorch。通过配对的耕地-林地用地类型互换，在保持耕地总量不变（FC=0）的前提下，降低耕地平均坡度并提升空间连片性。
+
+本工具箱包含以下工具：
+1. DRL 用地优化 - 主优化工具
+2. 依赖检查 - 验证运行环境
+
+系统要求：ArcMap 10.x + Python 2.7 + NumPy</idAbs>
+    <searchKeys>
+      <keyword>耕地空间布局优化</keyword>
+      <keyword>深度强化学习</keyword>
+      <keyword>DRL</keyword>
+      <keyword>ArcMap</keyword>
+      <keyword>用地优化</keyword>
+    </searchKeys>
+  </dataIdInfo>
+</metadata>

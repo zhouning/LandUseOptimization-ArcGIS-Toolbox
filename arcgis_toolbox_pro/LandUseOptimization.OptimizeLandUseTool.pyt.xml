@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xml:lang="zh">
+  <Esri>
+    <CreaDate>20260226</CreaDate>
+    <CreaTime>14430300</CreaTime>
+    <ArcGISFormat>1.0</ArcGISFormat>
+    <SyncOnce>TRUE</SyncOnce>
+    <ModDate>20260226</ModDate>
+    <ModTime>200000</ModTime>
+  </Esri>
+  <tool name="OptimizeLandUseTool" displayname="DRL 用地优化" toolboxalias="LandUseOpt">
+    <summary>使用训练好的深度强化学习（Maskable PPO）模型优化耕地布局。通过配对的耕地-林地用地互换，降低耕地平均坡度并提升空间连片性，同时保证耕地总量守恒（FC=0）。</summary>
+    <usage>
+      <bullet_item>输入要素类必须为面（Polygon）类型，且包含用地分类文本字段和坡度数值字段。</bullet_item>
+      <bullet_item>工具会自动根据指定的耕地类型名称和林地类型名称将地块分为三类：耕地（Farmland）、林地（Forest）、其他（Other）。仅耕地和林地地块参与优化。</bullet_item>
+      <bullet_item>优化采用配对推理策略：每一对操作包含一次耕地→林地转换和一次林地→耕地转换，确保耕地数量不变。</bullet_item>
+      <bullet_item>模型是维度无关的——相同权重可用于任意数量的地块，支持跨数据集迁移，无需重新训练。</bullet_item>
+      <bullet_item>转换对数（默认100）控制优化程度。数值越大，优化越充分，但耗时越长。实际执行对数不会超过耕地或林地的较小数量。</bullet_item>
+      <bullet_item>输出要素类包含所有原始字段，并新增4个字段：OPT_DLMC（优化后用地分类名称）、OPT_TYPE（类型编码：0=其他, 1=耕地, 2=林地）、CHG_FLAG（变化标记：0=未变, 1=耕地→林地, 2=林地→耕地）、ORIG_DLMC（原始用地分类名称）。</bullet_item>
+      <bullet_item>首次使用前建议先运行"依赖检查"工具，确保 PyTorch 等依赖已正确安装。</bullet_item>
+      <bullet_item>如果 ArcGIS Pro 许可级别为 Advanced，邻接图构建使用 PolygonNeighbors（速度快）；否则使用几何相交回退方法（速度较慢但结果一致）。</bullet_item>
+    </usage>
+    <parameters>
+      <param name="input_fc" displayname="输入要素类" datatype="DEFeatureClass" direction="Input" expression="input_fc" type="Required">
+        <dialogReference>输入的面要素类，包含待优化的用地地块。必须包含用地分类文本字段（如 DLMC）和坡度数值字段（如 Slope）。支持 Shapefile 和文件地理数据库要素类。坐标系应为投影坐标系（单位为米）。</dialogReference>
+        <pythonReference>输入面要素类的路径。例如：r"C:\data\study_area.shp" 或 r"C:\data\gdb.gdb\parcels"</pythonReference>
+      </param>
+      <param name="dlmc_field" displayname="用地分类字段 (DLMC)" datatype="Field" direction="Input" expression="dlmc_field" type="Required">
+        <dialogReference>用地分类名称文本字段。工具通过该字段的值识别耕地和林地地块。字段值须与下方设置的耕地类型名称和林地类型名称完全匹配（区分大小写）。常见值如：旱地、水田、果园、有林地等。</dialogReference>
+        <pythonReference>字符串，用地分类字段名。例如："DLMC"</pythonReference>
+      </param>
+      <param name="slope_field" displayname="坡度字段" datatype="Field" direction="Input" expression="slope_field" type="Required">
+        <dialogReference>坡度数值字段（单位：度）。这是优化的核心目标——工具致力于降低所有耕地地块的平均坡度。通常为基于 DEM 计算的最大坡度或平均坡度。支持 Double、Single、Long、Short 类型。</dialogReference>
+        <pythonReference>字符串，坡度字段名。例如："Slope"</pythonReference>
+      </param>
+      <param name="output_fc" displayname="输出要素类" datatype="DEFeatureClass" direction="Output" expression="output_fc" type="Required">
+        <dialogReference>优化结果输出的面要素类路径。输出包含所有原始字段及新增的 OPT_DLMC、OPT_TYPE、CHG_FLAG、ORIG_DLMC 四个字段。可通过 CHG_FLAG 字段快速筛选发生变化的地块。</dialogReference>
+        <pythonReference>输出要素类路径。例如：r"C:\data\results.gdb\optimized_parcels"</pythonReference>
+      </param>
+      <param name="model_weights" displayname="模型权重文件 (.pt)" datatype="DEFile" direction="Input" expression="model_weights" type="Optional">
+        <dialogReference>训练好的 DRL 模型权重文件（.pt 格式）。默认使用工具箱自带的 models/scorer_weights_v7.pt。模型维度无关，同一权重可用于不同规模的数据集，无需重新训练。</dialogReference>
+        <pythonReference>模型权重文件路径。例如：r"C:\toolbox\models\scorer_weights_v7.pt"</pythonReference>
+      </param>
+      <param name="n_pairs" displayname="转换对数" datatype="GPLong" direction="Input" expression="n_pairs" type="Optional">
+        <dialogReference>执行的耕地-林地互换对数（范围：1-500，默认：100）。每一对包含一次耕地→林地转换和一次林地→耕地转换，保证耕地总量不变。数值越大优化越充分，但耗时越长。实际执行对数受限于可用的耕地和林地数量中的较小值。</dialogReference>
+        <pythonReference>整数，转换对数。默认 100。</pythonReference>
+      </param>
+      <param name="farmland_types" displayname="耕地类型名称" datatype="GPString" direction="Input" expression="farmland_types" type="Optional">
+        <dialogReference>代表耕地（可耕作土地）的用地分类名称列表。默认为"旱地"和"水田"。这些名称必须与用地分类字段中的文本值完全匹配。只有匹配的地块才被视为耕地候选。可根据实际数据添加或修改。</dialogReference>
+        <pythonReference>字符串列表。默认 ["旱地", "水田"]。</pythonReference>
+      </param>
+      <param name="forest_types" displayname="林地类型名称" datatype="GPString" direction="Input" expression="forest_types" type="Optional">
+        <dialogReference>代表林地的用地分类名称列表。默认为"果园"和"有林地"。这些名称必须与用地分类字段中的文本值完全匹配。只有匹配的地块才被视为林地候选。可根据实际数据添加或修改。</dialogReference>
+        <pythonReference>字符串列表。默认 ["果园", "有林地"]。</pythonReference>
+      </param>
+    </parameters>
+    <scriptExamples>
+      <scriptExample>
+        <title>Python 脚本调用示例</title>
+        <description>在 ArcGIS Pro 的 Python 窗口中调用 DRL 用地优化工具</description>
+        <code>
+import arcpy
+
+# 添加工具箱
+arcpy.ImportToolbox(r"D:\arcgis_toolbox\LandUseOptimization.pyt")
+
+# 运行优化
+arcpy.LandUseOpt.OptimizeLandUseTool(
+    input_fc=r"D:\data\study_area.shp",
+    dlmc_field="DLMC",
+    slope_field="Slope",
+    output_fc=r"D:\results\optimized.shp",
+    model_weights=r"D:\arcgis_toolbox\models\scorer_weights_v7.pt",
+    n_pairs=100,
+    farmland_types=["旱地", "水田"],
+    forest_types=["果园", "有林地"],
+)
+        </code>
+      </scriptExample>
+    </scriptExamples>
+  </tool>
+</metadata>

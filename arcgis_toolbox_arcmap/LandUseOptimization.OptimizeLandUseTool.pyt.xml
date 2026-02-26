@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xml:lang="zh">
+  <Esri>
+    <CreaDate>20260226</CreaDate>
+    <CreaTime>20000000</CreaTime>
+    <ArcGISFormat>1.0</ArcGISFormat>
+    <SyncOnce>TRUE</SyncOnce>
+  </Esri>
+  <tool name="OptimizeLandUseTool" displayname="DRL 用地优化" toolboxalias="LandUseOpt">
+    <summary>使用训练好的深度强化学习（Maskable PPO）模型优化耕地布局（ArcMap版，纯 NumPy 推理，无需 PyTorch）。通过配对的耕地-林地用地互换，降低耕地平均坡度并提升空间连片性，同时保证耕地总量守恒（FC=0）。</summary>
+    <usage>
+      <bullet_item>输入要素类必须为面（Polygon）类型，且包含用地分类文本字段和坡度数值字段。</bullet_item>
+      <bullet_item>工具会根据指定的耕地类型名称和林地类型名称将地块分为三类：耕地、林地、其他。仅耕地和林地地块参与优化。</bullet_item>
+      <bullet_item>优化采用配对推理策略：每对操作包含一次耕地转林地和一次林地转耕地，确保耕地数量不变。</bullet_item>
+      <bullet_item>模型权重使用 .npz 格式（纯 NumPy），需通过 convert_weights_to_npz.py 从 .pt 格式转换。转换只需执行一次。</bullet_item>
+      <bullet_item>转换对数（默认100）控制优化程度。数值越大优化越充分，但耗时越长。</bullet_item>
+      <bullet_item>输出要素类包含所有原始字段及新增字段：OPT_DLMC、OPT_TYPE、CHG_FLAG、ORIG_DLMC。</bullet_item>
+      <bullet_item>首次使用前建议先运行"依赖检查"工具。</bullet_item>
+      <bullet_item>注意：ArcMap 使用 32 位 Python，处理大数据集（超过 50000 条记录）时可能出现内存不足。建议大数据使用 ArcGIS Pro 版本。</bullet_item>
+    </usage>
+    <parameters>
+      <param name="input_fc" displayname="输入要素类" datatype="DEFeatureClass" direction="Input" expression="input_fc" type="Required">
+        <dialogReference>输入的面要素类，包含待优化的用地地块。必须包含用地分类文本字段和坡度数值字段。支持 Shapefile 和个人/文件地理数据库要素类。</dialogReference>
+      </param>
+      <param name="dlmc_field" displayname="用地分类字段 (DLMC)" datatype="Field" direction="Input" expression="dlmc_field" type="Required">
+        <dialogReference>用地分类名称文本字段。字段值须与下方设置的耕地类型名称和林地类型名称完全匹配。</dialogReference>
+      </param>
+      <param name="slope_field" displayname="坡度字段" datatype="Field" direction="Input" expression="slope_field" type="Required">
+        <dialogReference>坡度数值字段（单位：度）。优化核心目标为降低耕地平均坡度。</dialogReference>
+      </param>
+      <param name="output_fc" displayname="输出要素类" datatype="DEFeatureClass" direction="Output" expression="output_fc" type="Required">
+        <dialogReference>优化结果输出的面要素类。包含原始字段及新增的 OPT_DLMC、OPT_TYPE、CHG_FLAG、ORIG_DLMC 字段。</dialogReference>
+      </param>
+      <param name="model_weights" displayname="模型权重文件 (.npz)" datatype="DEFile" direction="Input" expression="model_weights" type="Optional">
+        <dialogReference>训练好的 DRL 模型权重文件（.npz 格式）。默认使用工具箱自带的 models/scorer_weights_v7.npz。</dialogReference>
+      </param>
+      <param name="n_pairs" displayname="转换对数" datatype="GPLong" direction="Input" expression="n_pairs" type="Optional">
+        <dialogReference>耕地-林地互换对数（1-500，默认100）。每对包含一次耕地转林地和一次林地转耕地，保证耕地总量不变。</dialogReference>
+      </param>
+      <param name="farmland_types" displayname="耕地类型名称" datatype="GPString" direction="Input" expression="farmland_types" type="Optional">
+        <dialogReference>耕地分类名称列表。默认：旱地、水田。须与数据中的值完全匹配。</dialogReference>
+      </param>
+      <param name="forest_types" displayname="林地类型名称" datatype="GPString" direction="Input" expression="forest_types" type="Optional">
+        <dialogReference>林地分类名称列表。默认：果园、有林地。须与数据中的值完全匹配。</dialogReference>
+      </param>
+    </parameters>
+  </tool>
+</metadata>
