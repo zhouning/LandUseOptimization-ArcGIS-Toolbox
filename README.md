@@ -2,13 +2,13 @@
 
 基于深度强化学习（DRL）的耕地空间布局优化 ArcGIS 工具箱。
 
-ArcGIS Toolbox for Farmland Layout Optimization using Deep Reinforcement Learning (Maskable PPO).
+ArcGIS Toolbox for Farmland Layout Optimization using Deep Reinforcement Learning.
 
 ---
 
 ## 功能简介
 
-通过训练好的 Maskable PPO 评分网络，执行配对的耕地-林地用地互换，在**保持耕地总量不变**（FC=0）的前提下：
+通过训练好的评分网络，执行配对的耕地-林地用地互换，在**保持耕地总量不变**（FC=0）的前提下：
 
 - **降低耕地平均坡度** — 将高坡度耕地置换为林地
 - **提升空间连片性** — 使耕地在空间上更加集中连片
@@ -89,9 +89,9 @@ ArcGIS Toolbox for Farmland Layout Optimization using Deep Reinforcement Learnin
 
 ## 技术原理
 
-- **算法**：基于深度强化学习（Maskable PPO）训练的评分网络
+- **算法**：基于深度强化学习训练的评分网络
 - **推理策略**：配对推理（交替 耕地→林地 / 林地→耕地），保证耕地总量守恒（FC=0）
-- **核心模块以预编译形式分发**，详细方法请参见相关学术论文
+- **核心模块以预编译形式分发**，详细方法请参见相关学术论文（有兴趣可以联系：zhouning@stu.pku.edu.cn）
 
 ## License
 
